@@ -9,6 +9,13 @@ as part of a tactile sensor project from CoRo lab.
 - **_src_** : Contains the source code of the project.
 - **_src/scenes_** : Contains the calibration chess pictures.
 
+## Build and install arducam_config_parser 
+- Before use, Build :
+```Bash
+  git clone https://github.com/ArduCAM/arducam_config_parser.git
+  cd arducam_config_parser/src
+  make clean && make
+```
 ## How to launch the project
 This project is made of a series of python scripts, to launch from the src file.
 > $ cd src/
@@ -27,5 +34,5 @@ This project is made of a series of python scripts, to launch from the src file.
 > $ sudo python3 src/5_disp_video.py ../Config/OV5647/stereo/OV5647_MIPI_2Lane_RAW8_8b_2592x1944_BA.cfg
 - **_src/6_depth_compute_WLS_old.py_** : Reconstruct the 3D point cloud scene 
 from the disparity map of `src/scenes/photo.png`. 
-The output is in `src/praxis_filtered.ply`, visionable with Open3d or MeshLab
+The output is in `src/praxis_filtered.ply`, displayable with _Open3d_ or _MeshLab_
 > $ python3 src/6_depth_compute_WLS_old.py

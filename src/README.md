@@ -4,12 +4,7 @@ Modified version of demonstration with ArduCamSDK to compute a stereo depth map 
 after installing the ArduCamSDK, launch each by each the python scripts (look at the end of this README).
 
 # Install library and OpenCV Environment
-## Build and install arducam_config_parser 
-- Build  
-```Bash
-  git clone https://github.com/ArduCAM/arducam_config_parser.git
-  cd arducam_config_parser/src
-  make clean && make
+
 ```
 - Install  
 ```Bash
