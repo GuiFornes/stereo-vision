@@ -3,29 +3,6 @@
 Modified version of demonstration with ArduCamSDK to compute a stereo depth map with OpenCV
 after installing the ArduCamSDK, launch each by each the python scripts (look at the end of this README).
 
-# Install library and OpenCV Environment
-
-```
-- Install  
-```Bash
-  make install
-```
-
-## Downlaod and install the latest libusb 
-- Download the [libusb](https://sourceforge.net/projects/libusb/files/libusb-1.0/) 
-- Copy the libusb-xxx.tar.bz to the Pi then run the following command to unzip it.[xxx：version number]
-```Bash
-tar -jxvf  libusb-xxx.tar.bz2  
-```
-- Before compilation, Run the following commands to config it  
-```Bash
-cd libusb-xxx 
-./configure --disable-udev
-```
-- Install the libusb library 
-```Bash
-sudo make install
-```
 ## Install Python 3 and python-opencv
 - Install Python 3
  ```bash

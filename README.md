@@ -15,6 +15,7 @@ as part of a tactile sensor project from CoRo lab.
   git clone https://github.com/ArduCAM/arducam_config_parser.git
   cd arducam_config_parser/src
   make clean && make
+  make install
 ```
 ## How to launch the project
 This project is made of a series of python scripts, to launch from the src file.
