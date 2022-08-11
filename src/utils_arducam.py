@@ -2,19 +2,19 @@ import os
 import sys
 import threading
 import time
-import json
-
 import ArducamSDK
 
 import arducam_config_parser
 from ImageConvert import *
 
-global Width, Height, color_mode, running, handle, cfg, save_raw, save_flag, ct, rt
 running = True
 save_flag = False
-save_raw = False
 cfg = {}
 handle = {}
+height = 720
+width = 1920
+ct, rt = threading.Thread(), threading.Thread()
+color_mode = 0
 
 
 def configBoard(config):
@@ -31,7 +31,7 @@ def camera_initFromFile(fileName):
     One of ArduCamSDK initialization function
     :param fileName: path to camera config file
     """
-    global cfg, handle, Width, Height, color_mode, save_raw
+    global cfg, handle, color_mode
     # load config file
     # config = json.load(open(fialeName,"r"))
     config = arducam_config_parser.LoadConfigFile(fileName)
@@ -39,12 +39,12 @@ def camera_initFromFile(fileName):
     camera_parameter = config.camera_param.getdict()
     Width = camera_parameter["WIDTH"]
     Height = camera_parameter["HEIGHT"]
+    camera_parameter = config.camera_param.getdict()
 
     BitWidth = camera_parameter["BIT_WIDTH"]
     ByteLength = 1
     if 8 < BitWidth <= 16:
         ByteLength = 2
-        save_raw = True
     FmtMode = camera_parameter["FORMAT"][0]
     color_mode = camera_parameter["FORMAT"][1]
     print("color mode", color_mode)
@@ -73,14 +73,14 @@ def camera_initFromFile(fileName):
         configs = config.configs
         configs_length = config.configs_length
         for i in range(configs_length):
-            type = configs[i].type
-            if ((type >> 16) & 0xFF) != 0 and ((type >> 16) & 0xFF) != usb_version:
+            c_type = configs[i].type
+            if ((c_type >> 16) & 0xFF) != 0 and ((c_type >> 16) & 0xFF) != usb_version:
                 continue
-            if type & 0xFFFF == arducam_config_parser.CONFIG_TYPE_REG:
+            if c_type & 0xFFFF == arducam_config_parser.CONFIG_TYPE_REG:
                 ArducamSDK.Py_ArduCam_writeSensorReg(handle, configs[i].params[0], configs[i].params[1])
-            elif type & 0xFFFF == arducam_config_parser.CONFIG_TYPE_DELAY:
+            elif c_type & 0xFFFF == arducam_config_parser.CONFIG_TYPE_DELAY:
                 time.sleep(float(configs[i].params[0]) / 1000)
-            elif type & 0xFFFF == arducam_config_parser.CONFIG_TYPE_VRCMD:
+            elif c_type & 0xFFFF == arducam_config_parser.CONFIG_TYPE_VRCMD:
                 configBoard(configs[i])
 
         ArducamSDK.Py_ArduCam_registerCtrls(handle, config.controls, config.controls_length)
@@ -90,11 +90,14 @@ def camera_initFromFile(fileName):
         # ArducamSDK.Py_ArduCam_setCtrl(handle, "setGain", 5)
         # ArducamSDK.Py_ArduCam_setCtrl(handle, "setAnalogueGain", 100)
 
-        ArducamSDK.Py_ArduCam_writeSensorReg(handle, 0x3503, 0x02)
+        ArducamSDK.Py_ArduCam_writeSensorReg(handle, 0x3503, 0b00000111)
+
+        ArducamSDK.Py_ArduCam_writeSensorReg(handle, 0x3500, 0b11111111)
+        ArducamSDK.Py_ArduCam_writeSensorReg(handle, 0x3501, 0b11111111)
+        ArducamSDK.Py_ArduCam_writeSensorReg(handle, 0x3502, 0b01111111)
 
         ArducamSDK.Py_ArduCam_writeSensorReg(handle, 0x350A, 0b00011000)
         ArducamSDK.Py_ArduCam_writeSensorReg(handle, 0x350B, 0b00111100)
-
 
         rtn_val, datas = ArducamSDK.Py_ArduCam_readUserData(handle, 0x400 - 16, 16)
         print("Serial: %c%c%c%c-%c%c%c%c-%c%c%c%c" % (datas[0], datas[1], datas[2], datas[3],
@@ -134,17 +137,7 @@ def captureImage_thread():
     ArducamSDK.Py_ArduCam_endCaptureImage(handle)
 
 
-try:
-    camera_params = json.load(open("camera_params.txt", "r"))
-except Exception as e:
-    print(e)
-    print("Please run 1_test.py first.")
-    exit(-1)
-width = camera_params['width']
-height = camera_params['height']
-
-
-def get_frame():
+def getFrame():
     """
     This function is used to get a frame from the handle
     :return:
@@ -157,7 +150,7 @@ def get_frame():
     datasize = rtn_cfg['u32Size']
     if rtn_val != 0 or datasize == 0:
         print("Error read image, rtn_val = ", rtn_val)
-        return get_frame()
+        return getFrame()
     image = convert_image(data, rtn_cfg, color_mode)
     image = cv2.resize(image, (width, height))
     # image = image[:, 250:1670]
@@ -169,20 +162,14 @@ def get_frame():
 
 def readImage_thread():
     """
-    Initial function to read and process the image, replaced by our own for processing.
+    Initial ArduCam demo function to read and process the image, replaced by our own for processing.
     """
-    global handle, running, Width, Height, save_flag, cfg, color_mode, save_raw
-    global COLOR_BayerGB2BGR, COLOR_BayerRG2BGR, COLOR_BayerGR2BGR, COLOR_BayerBG2BGR
+    global handle, running, width, height, save_flag, cfg
     count = 0
-    totalFrame = 0
     time0 = time.time()
-    time1 = time.time()
-    data = {}
     cv2.namedWindow("ArduCam Demo", 1)
-    if not os.path.exists("images"):
-        os.makedirs("images")
     while running:
-        image = get_frame()
+        image = getFrame()
         if image is None:
             time.sleep(0.01)
             continue
@@ -194,14 +181,6 @@ def readImage_thread():
             count = 0
             time0 = time1
         count += 1
-
-        # Save image
-        if save_flag:
-            cv2.imwrite("images/image%d.jpg" % totalFrame, image)
-            if save_raw:
-                with open("images/image%d.raw" % totalFrame, 'wb') as f:
-                    f.write(data)
-            totalFrame += 1
 
         # Show image
         image = cv2.resize(image, (1280, 480), interpolation=cv2.INTER_LINEAR)
@@ -236,7 +215,6 @@ def init():
     Initialize the camera, the handle, and the image-capturer and command threads
     """
     global ct, rt
-    config_file_name = ""
     if len(sys.argv) > 1:
         config_file_name = sys.argv[1]
 
@@ -258,8 +236,8 @@ def init():
 
 def close():
     """
-    Close the threads and the camera
-    :return:
+    Close the threads and the camera.
+    init() should have been launch before.
     """
     global ct, rt
     ct.join()
@@ -272,7 +250,7 @@ def close():
         print("device close fail!")
 
 
-def increase_brightness(img, value=1):  # Unused yet
+def increaseBrightness(img, value=1):  # Unused yet
     """
     Increase the brightness of the image
     :param img: image entry
