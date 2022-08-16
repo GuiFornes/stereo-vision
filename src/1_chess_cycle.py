@@ -56,8 +56,6 @@ if __name__ == "__main__":
         cv2.imshow("pair", frame)
         key = cv2.waitKey(1) & 0xFF
 
-        ArducamSDK.Py_ArduCam_del(arducam.handle)
-
         # Press 'Q' key to quit, or wait till all photos are taken
         if (key == ord("q")) | (counter >= TOTAL_CALIB_PICS):
             arducam.running = False

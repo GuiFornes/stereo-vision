@@ -7,7 +7,7 @@ import utils_stereovision as stereovision
 # Calibration and computation flags and parameters
 ###################################################
 CHESSBOARD_SIZE = (6, 9)
-SQUARE_SIZE = 7.25  # in mm
+SQUARE_SIZE = 22  # <- A4 printed chessboard, otherwise chessboard on my phone -> 7.25  # in mm
 CHESSBOARD_OPTIONS = (cv2.CALIB_CB_ADAPTIVE_THRESH |
                       cv2.CALIB_CB_NORMALIZE_IMAGE | cv2.CALIB_CB_FAST_CHECK)
 OBJECT_POINT_ZERO = np.zeros((CHESSBOARD_SIZE[0] * CHESSBOARD_SIZE[1], 3), np.float32)
@@ -22,9 +22,9 @@ TERMINATION_CRITERIA = (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_MAX_ITER, 30, 
 ###################################################
 VERBOSE = True
 MAX_IMAGES = 120
-DRAW_CHESSBOARD = 0
-INTRINSEQUE_CALIBRATION_EVAL = 1
-EXTRINSEQUE_CALIBRATION_EVAL = 1
+DRAW_CHESSBOARD = 0  # Show (or not) the result of chessboard detection
+INTRINSIC_CALIBRATION_EVAL = 1  # Display th result of intrinsic calibration
+EXTRINSIC_CALIBRATION_EVAL = 1  # Display the result of extrinsic calibration
 
 
 def readImagesAndFindChessboards():
@@ -71,36 +71,12 @@ def readImagesAndFindChessboards():
 
         if retL:
             objPointsLeftOnly.append(corner_coordinates)
-            cv2.cornerSubPix(grayL, cornersL, (3, 3), (-1, -1), SUBPIX_CRITERIA)
+            cornersL = cv2.cornerSubPix(grayL, cornersL, (3, 3), (-1, -1), SUBPIX_CRITERIA)
             imgPointsLeftOnly.append(cornersL)
         if retR:
             objPointsRightOnly.append(corner_coordinates)
-            cv2.cornerSubPix(grayR, cornersR, (3, 3), (-1, -1), SUBPIX_CRITERIA)
+            cornersR = cv2.cornerSubPix(grayR, cornersR, (3, 3), (-1, -1), SUBPIX_CRITERIA)
             imgPointsRightOnly.append(cornersR)
-        if not retL or not retR:
-            if not retL and not retR:
-                notfound.append(photo_counter)
-            print('[WARN] Could not find chessboard in pair No ' + str(photo_counter) +
-                  ': retL = ' + str(retL) + ', retR = ' + str(retR))
-            continue
-
-        '''
-        # Here is our scaling trick! Higher res to better find chessboard, lower res for a speeder calibration!
-        smallGrayL = cv2.resize(grayL, (WORKING_WIDTH, WORKING_HEIGHT))
-        smallGrayR = cv2.resize(grayR, (WORKING_WIDTH, WORKING_HEIGHT))
-
-        scale_ratio = height / WORKING_HEIGHT
-        print("Scale ratio: ", scale_ratio)
-        cornersL = cornersL * scale_ratio
-        cornersR = cornersR * scale_ratio
-        '''
-
-        # Refine corners and add to array for processing
-        objPoints.append(corner_coordinates)
-        cv2.cornerSubPix(grayL, cornersL, (3, 3), (-1, -1), SUBPIX_CRITERIA)
-        cv2.cornerSubPix(grayR, cornersR, (3, 3), (-1, -1), SUBPIX_CRITERIA)
-        imgPointsLeftPaired.append(cornersL)
-        imgPointsRightPaired.append(cornersR)
 
         if DRAW_CHESSBOARD:  # Draw and display the chessboard corners
             cv2.namedWindow("Corners LEFT")
@@ -116,12 +92,26 @@ def readImagesAndFindChessboards():
                 exit(0)
             cv2.destroyAllWindows()
 
+        if not retL or not retR:
+            if not retL and not retR:
+                notfound.append(photo_counter)
+            print('[WARN] Could not find chessboard in pair No ' + str(photo_counter) +
+                  ': retL = ' + str(retL) + ', retR = ' + str(retR))
+            continue
+
+        # Reaching this part means that we found the chessboard in both images
+        objPoints.append(corner_coordinates)
+        imgPointsLeftPaired.append(cornersL)
+        imgPointsRightPaired.append(cornersR)
+        continue
+
     if VERBOSE:
         print("[INFO] Found corners in both (stereo pair) for {0} out of {1} images"
               .format(len(imgPointsRightPaired), photo_counter))
         if len(notfound) > 0:
             print("[INFO] Not found in ", notfound)
 
+    # Could be upgrade to not re-search corners each time if pictures as not changed
     np.savez_compressed('calib_data/found_corners_cache.npz', objPoints=objPoints,
                         imgPointsLeftPaired=imgPointsLeftPaired, imgPointsRightPaired=imgPointsRightPaired)
     return objPointsLeftOnly, imgPointsLeftOnly, objPointsRightOnly, imgPointsRightOnly, \
@@ -135,6 +125,8 @@ def draw_epipolar_line(img, line, color=(0, 0, 255)):
 
 def calibration_graphic_eval():
     # Read the images
+    if not os.path.exists('scenes/photo.png'):
+        print("[ERROR] 'scenes/photo.png' not found, launch 0_test.py and press 's' first")
     stereo_pair = cv2.imread('scenes/photo.png')
     imageL, imageR = stereovision.splitStereoImage(stereo_pair)
     rectifiedL, rectifiedR = stereovision.rectifyImages(imageL, imageR)
@@ -180,19 +172,19 @@ if __name__ == '__main__':
     if VERBOSE:
         print("rightCameraMatrix: ", rightCameraMatrix)
 
-    if INTRINSEQUE_CALIBRATION_EVAL:  # Visual evaluation of intrinsic calibration
+    if INTRINSIC_CALIBRATION_EVAL:  # Visual evaluation of intrinsic calibration
         stereo_chess = cv2.imread('scenes/scene_1920x720_1.png')
         imL, imR = stereovision.splitStereoImage(stereo_chess)
         imL = cv2.rotate(imL, cv2.ROTATE_90_CLOCKWISE)
         imR = cv2.rotate(imR, cv2.ROTATE_90_CLOCKWISE)
-        for row in np.linspace(0, imL.shape[0], 50):
-            draw_epipolar_line(imL, int(row))
-            draw_epipolar_line(imR, int(row))
+        for r in np.linspace(0, imL.shape[0], 20):
+            draw_epipolar_line(imL, int(r))
+            draw_epipolar_line(imR, int(r))
         imL = cv2.rotate(imL, cv2.ROTATE_90_COUNTERCLOCKWISE)
         imR = cv2.rotate(imR, cv2.ROTATE_90_COUNTERCLOCKWISE)
-        for row in np.linspace(0, imL.shape[0], 50):
-            draw_epipolar_line(imL, int(row))
-            draw_epipolar_line(imR, int(row))
+        for r in np.linspace(0, imL.shape[0], 20):
+            draw_epipolar_line(imL, int(r))
+            draw_epipolar_line(imR, int(r))
         undistortedL = cv2.undistort(imL, leftCameraMatrix, leftDistortionCoefficients, None, None)
         undistortedR = cv2.undistort(imR, rightCameraMatrix, rightDistortionCoefficients, None, None)
         cv2.imshow('Stereo Pair', stereo_chess)
@@ -237,7 +229,7 @@ if __name__ == '__main__':
                         leftMapX=leftMapX, leftMapY=leftMapY, leftROI=leftROI,
                         rightMapX=rightMapX, rightMapY=rightMapY, rightROI=rightROI)
 
-    if EXTRINSEQUE_CALIBRATION_EVAL:
+    if EXTRINSIC_CALIBRATION_EVAL:
         calibration_graphic_eval()  # Visual evaluation of stereo/extrinsic calibration
 
         # Accuracy according to https://docs.opencv.org/4.x/dc/dbb/tutorial_py_calibration.html
