@@ -2,8 +2,6 @@ import utils_arducam as arducam
 import time
 import cv2
 
-import ArducamSDK
-
 if __name__ == "__main__":
     # Initialisation of the camera
     ret_val = arducam.init()

@@ -1,12 +1,13 @@
 import cv2
 import os
-from utils_stereovision import TOTAL_CALIB_PICS
+from utils_stereovision import TOTAL_CALIB_PICS, splitStereoImage
 from utils_arducam import width, height
 
 # Global variables preset
 img_height = width
 img_width = int(height / 2)
 VERBOSE = True
+
 
 def stereo_pair_cutter():
     photo_counter = 0
@@ -20,11 +21,11 @@ def stereo_pair_cutter():
             print("[WARN] No file named " + filename)
             continue
         pair_img = cv2.imread(filename, -1)
-
         cv2.imshow("ImagePair", pair_img)
         cv2.waitKey(0)
-        imgLeft = pair_img[0:img_height, 0:img_width]
-        imgRight = pair_img[0:img_height, img_width:width]
+        imgLeft, imgRight = splitStereoImage(pair_img)
+        if imgRight.shape != imgLeft.shape:
+            print("[WARN] Split images shape are not equal")
         leftName = './pairs/left_' + str(photo_counter).zfill(2) + '.png'
         rightName = './pairs/right_' + str(photo_counter).zfill(2) + '.png'
         cv2.imwrite(leftName, imgLeft)

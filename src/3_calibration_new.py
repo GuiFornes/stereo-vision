@@ -7,7 +7,7 @@ import utils_stereovision as stereovision
 # Calibration and computation flags and parameters
 ###################################################
 CHESSBOARD_SIZE = (6, 9)
-SQUARE_SIZE = 0.725  # in cm
+SQUARE_SIZE = 7.25  # in mm
 CHESSBOARD_OPTIONS = (cv2.CALIB_CB_ADAPTIVE_THRESH |
                       cv2.CALIB_CB_NORMALIZE_IMAGE | cv2.CALIB_CB_FAST_CHECK)
 OBJECT_POINT_ZERO = np.zeros((CHESSBOARD_SIZE[0] * CHESSBOARD_SIZE[1], 3), np.float32)
@@ -117,15 +117,20 @@ def readImagesAndFindChessboards():
             cv2.destroyAllWindows()
 
     if VERBOSE:
-        print("[INFO] Found corners in {0} out of {1} images"
-          .format(len(imgPointsRightPaired), photo_counter))
-        if len(imgPointsRightPaired) != photo_counter:
+        print("[INFO] Found corners in both (stereo pair) for {0} out of {1} images"
+              .format(len(imgPointsRightPaired), photo_counter))
+        if len(notfound) > 0:
             print("[INFO] Not found in ", notfound)
 
     np.savez_compressed('calib_data/found_corners_cache.npz', objPoints=objPoints,
                         imgPointsLeftPaired=imgPointsLeftPaired, imgPointsRightPaired=imgPointsRightPaired)
     return objPointsLeftOnly, imgPointsLeftOnly, objPointsRightOnly, imgPointsRightOnly, \
            objPoints, imgPointsLeftPaired, imgPointsRightPaired, (height, width)
+
+
+def draw_epipolar_line(img, line, color=(0, 0, 255)):
+    cv2.line(img, (0, line), (img.shape[1], line), color, 1)
+    return img
 
 
 def calibration_graphic_eval():
@@ -136,10 +141,6 @@ def calibration_graphic_eval():
 
     cv2.imwrite("rectified_left.png", rectifiedL)
     cv2.imwrite("rectified_right.png", rectifiedR)
-
-    def draw_epipolar_line(img, line, color=(0, 0, 255)):
-        cv2.line(img, (0, line), (img.shape[1], line), color, 1)
-        return img
 
     for row in np.linspace(0, imageL.shape[0], 10):
         draw_epipolar_line(rectifiedL, int(row))
@@ -182,6 +183,16 @@ if __name__ == '__main__':
     if INTRINSEQUE_CALIBRATION_EVAL:  # Visual evaluation of intrinsic calibration
         stereo_chess = cv2.imread('scenes/scene_1920x720_1.png')
         imL, imR = stereovision.splitStereoImage(stereo_chess)
+        imL = cv2.rotate(imL, cv2.ROTATE_90_CLOCKWISE)
+        imR = cv2.rotate(imR, cv2.ROTATE_90_CLOCKWISE)
+        for row in np.linspace(0, imL.shape[0], 50):
+            draw_epipolar_line(imL, int(row))
+            draw_epipolar_line(imR, int(row))
+        imL = cv2.rotate(imL, cv2.ROTATE_90_COUNTERCLOCKWISE)
+        imR = cv2.rotate(imR, cv2.ROTATE_90_COUNTERCLOCKWISE)
+        for row in np.linspace(0, imL.shape[0], 50):
+            draw_epipolar_line(imL, int(row))
+            draw_epipolar_line(imR, int(row))
         undistortedL = cv2.undistort(imL, leftCameraMatrix, leftDistortionCoefficients, None, None)
         undistortedR = cv2.undistort(imR, rightCameraMatrix, rightDistortionCoefficients, None, None)
         cv2.imshow('Stereo Pair', stereo_chess)

@@ -15,22 +15,42 @@ sudo pip3 install opencv-python
 ```
 
 # Usage
-This project is made of a series of python scripts, to launch from the src file.
+This project is made of a series of python scripts, to launch from the src repository.
+If you are not already in, do this:
+```Bash
 > $ cd src/
-
-- **_src/0_test.py_** : Test the camera and allow the user to take a picture with 's' + 'enter'.
-> $ sudo python3 src/0_test.py ../Config/OV5647/stereo/OV5647_MIPI_2Lane_RAW8_8b_2592x1944_BA.cfg
-- **_src/1_chess_cycle.py_** : Launch it to take chessboard images for calibration.
-> $ sudo python3 src/1_chess_cycle.py ../Config/OV5647/stereo/OV5647_MIPI_2Lane_RAW8_8b_2592x1944_BA.cfg
+```
+### The first 3 scripts depend on each others in the right order, and consist of the calibration of the stereo-system
+- **_src/0_test.py_** : Test the camera and allow the user to take a picture with 's' + 'enter' 
+(Needed for futur non-video scripts).
+ ```bash
+sudo python3 0_test.py ../Config/OV5647/stereo/OV5647_MIPI_2Lane_RAW8_8b_2592x1944_BA.cfg
+```
+- **_src/1_chess_cycle.py_** : Launch this one to take chessboard images for calibration. 
+The number of images to take is set in `utils_stereovision.py`.
+ ```bash
+sudo python3 1_chess_cycle.py ../Config/OV5647/stereo/OV5647_MIPI_2Lane_RAW8_8b_2592x1944_BA.cfg
+```
 - **_src/2_pairs_cut.py_** : Cut the stereo images into left and right views.
-> $ python3 src/2_pairs_cut.py
+ ```bash
+python3 2_pairs_cut.py
+```
 - **_src/3_calibration_new.py_** : Calibrate the cameras intrinsic and extrinsic.
-> $ python3 src/3_calibration_new.py
+ ```bash
+python3 3_calibration_new.py
+```
+### The following scripts are independent of each others and can be launched after that the calibration is realized.
 - **_src/4_disparity/py_** : Compute and show the disparity map of `src/scenes/photo.png`.
-> $ python3 src/4_disparity.py
+ ```bash
+python3 4_disparity.py
+```
 - **_src/5_disp_video.py_** : Display a live disparity map of the camera entry.
-> $ sudo python3 src/5_disp_video.py ../Config/OV5647/stereo/OV5647_MIPI_2Lane_RAW8_8b_2592x1944_BA.cfg
+ ```bash
+sudo python3 5_disp_video.py ../Config/OV5647/stereo/OV5647_MIPI_2Lane_RAW8_8b_2592x1944_BA.cfg
+```
 - **_src/6_depth_compute_WLS_old.py_** : Reconstruct the 3D point cloud scene 
 from the disparity map of `src/scenes/photo.png`. 
 The output is in `src/praxis_filtered.ply`, visionnable with MeshLab
-> $ python3 src/6_depth_compute_WLS_old.py
+ ```bash
+python3 6_depth_compute.py
+```

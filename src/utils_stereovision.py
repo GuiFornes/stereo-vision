@@ -17,7 +17,7 @@ def rectifyImages(imL, imR, calib_data='calib_data/calibration.npz'):
     :return: rectified left and right images
     """
     # Load the saved data
-    with np.load('calib_data/calibration.npz') as data:
+    with np.load(calib_data) as data:
         leftMapX = data['leftMapX']
         leftMapY = data['leftMapY']
         leftROI = data['leftROI']
@@ -30,8 +30,8 @@ def rectifyImages(imL, imR, calib_data='calib_data/calibration.npz'):
     rectifiedR = cv2.remap(imR, rightMapX, rightMapY, cv2.INTER_LINEAR)
 
     # Crop the images
-    # imgL = imgL[leftROI[1]:leftROI[1] + leftROI[3], leftROI[0]:leftROI[0] + leftROI[2]]
-    # imgR = imgR[rightROI[1]:rightROI[1] + rightROI[3], rightROI[0]:rightROI[0] + rightROI[2]]
+    #rectifiedL = rectifiedL[leftROI[1]:leftROI[1] + leftROI[3], leftROI[0]:leftROI[0] + leftROI[2]]
+    #rectifiedR = rectifiedR[rightROI[1]:rightROI[1] + rightROI[3], rightROI[0]:rightROI[0] + rightROI[2]]
     return rectifiedL, rectifiedR
 
 
@@ -150,6 +150,27 @@ class Matchers:
         return filtered_disp_vis
 
 
-
-
-
+def write_ply(fn, verts, colors=None):
+    """
+    Write point cloud to PLY file.
+    :param fn: output file name
+    :param verts: coordinates of the points
+    :param colors: corresponding colors
+    """
+    ply_header = '''ply
+    format ascii 1.0
+    element vertex %(vert_num)d
+    property float x
+    property float y
+    property float z
+    property uchar red
+    property uchar green
+    property uchar blue
+    end_header
+    '''
+    out_colors = colors.copy()
+    verts = verts.reshape(-1, 3)
+    verts = np.hstack([verts, out_colors])
+    with open(fn, 'wb') as f:
+        f.write((ply_header % dict(vert_num=len(verts))).encode('utf-8'))
+        np.savetxt(f, verts, fmt='%f %f %f %d %d %d ')
