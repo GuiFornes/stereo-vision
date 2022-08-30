@@ -3,15 +3,15 @@
 Modified version of demonstration with ArduCamSDK to compute a stereo depth map with OpenCV
 after installing the ArduCamSDK, launch each by each the python scripts (look at the end of this README).
 
-## Install Python 3 and python-opencv
+## Install Python 3 and OpenCV
 - Install Python 3
  ```bash
- sudo apt-get install python
+ sudo apt-get install python3
  ``` 
 
-- Install opencv
+- Install opencv with pip3
 ```Bash
-sudo pip3 install opencv-python
+sudo pip3 install opencv-contrib-python
 ```
 
 # Usage
