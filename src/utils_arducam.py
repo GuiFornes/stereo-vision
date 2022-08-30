@@ -96,8 +96,13 @@ def camera_initFromFile(fileName):
         ArducamSDK.Py_ArduCam_writeSensorReg(handle, 0x3501, 0b11111111)
         ArducamSDK.Py_ArduCam_writeSensorReg(handle, 0x3502, 0b01111111)
 
-        ArducamSDK.Py_ArduCam_writeSensorReg(handle, 0x350A, 0b00011000)
-        ArducamSDK.Py_ArduCam_writeSensorReg(handle, 0x350B, 0b00111100)
+        # Darker
+        ArducamSDK.Py_ArduCam_writeSensorReg(handle, 0x350A, 0b00000000)
+        ArducamSDK.Py_ArduCam_writeSensorReg(handle, 0x350B, 0b00000000)
+
+        # Brighter
+        # ArducamSDK.Py_ArduCam_writeSensorReg(handle, 0x350A, 0b00011000)
+        # ArducamSDK.Py_ArduCam_writeSensorReg(handle, 0x350B, 0b00111100)
 
         rtn_val, datas = ArducamSDK.Py_ArduCam_readUserData(handle, 0x400 - 16, 16)
         print("Serial: %c%c%c%c-%c%c%c%c-%c%c%c%c" % (datas[0], datas[1], datas[2], datas[3],

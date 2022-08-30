@@ -6,25 +6,24 @@ import utils_stereovision as stereovision
 ###################################################
 # Calibration and computation flags and parameters
 ###################################################
-CHESSBOARD_SIZE = (6, 9)
-SQUARE_SIZE = 22  # <- A4 printed chessboard, otherwise chessboard on my phone -> 7.25  # in mm
+CHESSBOARD_SIZE = stereovision.CHESSBOARD_SIZE
+SQUARE_SIZE = stereovision.SQUARE_SIZE
 CHESSBOARD_OPTIONS = (cv2.CALIB_CB_ADAPTIVE_THRESH |
                       cv2.CALIB_CB_NORMALIZE_IMAGE | cv2.CALIB_CB_FAST_CHECK)
 OBJECT_POINT_ZERO = np.zeros((CHESSBOARD_SIZE[0] * CHESSBOARD_SIZE[1], 3), np.float32)
 OBJECT_POINT_ZERO[:, :2] = np.mgrid[0:CHESSBOARD_SIZE[0], 0:CHESSBOARD_SIZE[1]].T.reshape(-1, 2)
 
 SUBPIX_CRITERIA = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.1)
-OPTIMIZE_ALPHA = 0
+OPTIMIZE_ALPHA = 0.9
 TERMINATION_CRITERIA = (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
 
 ###################################################
 # Execution parameters
 ###################################################
 VERBOSE = True
-MAX_IMAGES = 120
-DRAW_CHESSBOARD = 0  # Show (or not) the result of chessboard detection
-INTRINSIC_CALIBRATION_EVAL = 1  # Display th result of intrinsic calibration
-EXTRINSIC_CALIBRATION_EVAL = 1  # Display the result of extrinsic calibration
+DRAW_CHESSBOARD = False  # Show (or not) the result of chessboard detection
+INTRINSIC_CALIBRATION_EVAL = True  # Display th result of intrinsic calibration
+EXTRINSIC_CALIBRATION_EVAL = True  # Display the result of extrinsic calibration
 
 
 def readImagesAndFindChessboards():
@@ -46,7 +45,7 @@ def readImagesAndFindChessboards():
 
     photo_counter = 0
     width, height = None, None
-    while photo_counter < MAX_IMAGES:
+    while photo_counter < stereovision.TOTAL_CALIB_PICS:
         photo_counter = photo_counter + 1
         leftName = './pairs/left_' + str(photo_counter).zfill(2) + '.png'
         rightName = './pairs/right_' + str(photo_counter).zfill(2) + '.png'
@@ -90,7 +89,6 @@ def readImagesAndFindChessboards():
             key = cv2.waitKey(0)
             if key == ord("q"):
                 exit(0)
-            cv2.destroyAllWindows()
 
         if not retL or not retR:
             if not retL and not retR:
@@ -104,7 +102,7 @@ def readImagesAndFindChessboards():
         imgPointsLeftPaired.append(cornersL)
         imgPointsRightPaired.append(cornersR)
         continue
-
+    cv2.destroyAllWindows()
     if VERBOSE:
         print("[INFO] Found corners in both (stereo pair) for {0} out of {1} images"
               .format(len(imgPointsRightPaired), photo_counter))
@@ -127,6 +125,7 @@ def calibration_graphic_eval():
     # Read the images
     if not os.path.exists('scenes/photo.png'):
         print("[ERROR] 'scenes/photo.png' not found, launch 0_test.py and press 's' first")
+        exit(0)
     stereo_pair = cv2.imread('scenes/photo.png')
     imageL, imageR = stereovision.splitStereoImage(stereo_pair)
     rectifiedL, rectifiedR = stereovision.rectifyImages(imageL, imageR)

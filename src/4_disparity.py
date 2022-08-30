@@ -22,6 +22,8 @@ if __name__ == '__main__':
     filtered_disp_vis = matchers.computeFilteredDisparityMap(rectifiedL, rectifiedR)
 
     # Display results
+    confidence = matchers.getConfidenceMap()
+    cv2.imshow('Confidence', confidence)
     cv2.imshow('raw Disparity Map', raw_disp_vis)
     cv2.imshow('Filtered Disparity Map Visual', filtered_disp_vis)
     cv2.imshow('left view', imgL)

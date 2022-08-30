@@ -1,18 +1,7 @@
 # Overview
 
 Modified version of demonstration with ArduCamSDK to compute a stereo depth map with OpenCV
-after installing the ArduCamSDK, launch each by each the python scripts (look at the end of this README).
-
-## Install Python 3 and python-opencv
-- Install Python 3
- ```bash
- sudo apt-get install python
- ``` 
-
-- Install opencv
-```Bash
-sudo pip3 install opencv-python
-```
+after installing the ArduCamSDK, you can play with them.
 
 # Usage
 This project is made of a series of python scripts, to launch from the src repository.
@@ -21,6 +10,8 @@ If you are not already in, do this:
 > $ cd src/
 ```
 ### The first 3 scripts depend on each others in the right order, and consist of the calibration of the stereo-system
+_Calibration datas is already provided in this repo, therefore if you don't want to re-calibrate the camera, 
+you can directly pass to the next part_
 - **_src/0_test.py_** : Test the camera and allow the user to take a picture with 's' + 'enter' 
 (Needed for futur non-video scripts).
  ```bash
@@ -48,7 +39,7 @@ python3 4_disparity.py
  ```bash
 sudo python3 5_disp_video.py ../Config/OV5647/stereo/OV5647_MIPI_2Lane_RAW8_8b_2592x1944_BA.cfg
 ```
-- **_src/6_depth_compute_WLS_old.py_** : Reconstruct the 3D point cloud scene 
+- **_src/6_depth_compute.py_** : Reconstruct the 3D point cloud scene 
 from the disparity map of `src/scenes/photo.png`. 
 The output is in `src/praxis_filtered.ply`, visionnable with MeshLab
  ```bash

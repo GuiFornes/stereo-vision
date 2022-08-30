@@ -7,6 +7,7 @@ from utils_arducam import width, height
 img_height = width
 img_width = int(height / 2)
 VERBOSE = True
+DISPLAY_IMAGES = False
 
 
 def stereo_pair_cutter():
@@ -21,8 +22,9 @@ def stereo_pair_cutter():
             print("[WARN] No file named " + filename)
             continue
         pair_img = cv2.imread(filename, -1)
-        cv2.imshow("ImagePair", pair_img)
-        cv2.waitKey(0)
+        if DISPLAY_IMAGES:
+            cv2.imshow("ImagePair", pair_img)
+            cv2.waitKey(0)
         imgLeft, imgRight = splitStereoImage(pair_img)
         if imgRight.shape != imgLeft.shape:
             print("[WARN] Split images shape are not equal")
