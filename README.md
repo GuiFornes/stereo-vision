@@ -37,3 +37,19 @@ This project is made of a series of python scripts, to launch from the src direc
 cd src/
 ```
 Next, watch to the `src/README.md` to see more about the scripts to launch.
+
+## References
+
+Those are different projects that I used to build this one.
+
+ - **_ArduCAM_** : source files to launch a camera with arduCam module.
+
+https://github.com/ArduCAM/arducam_config_parser.git
+https://github.com/ArduCAM/ArduCAM_USB_Camera_Shield.git
+
+ - **_Others stereo-vision projects_** :
+
+https://github.com/kanavsinglaa/StereoVision.git
+https://github.com/ArduCAM/MIPI_Camera.git
+https://github.com/realizator/stereopi-fisheye-robot.git
+https://github.com/niconielsen32/ComputerVision.git
