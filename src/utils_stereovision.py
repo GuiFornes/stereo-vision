@@ -216,9 +216,10 @@ def sphere_crop_ply(pcd, radius=175):
     center = pcd.get_center()
     distances = np.linalg.norm(points - center, axis=1)
     indexes = np.where(distances <= radius)[0]
-    pcd.points = o3d.utility.Vector3dVector(points[indexes])
-    pcd.colors = o3d.utility.Vector3dVector(colors[indexes])
-    return pcd
+    out_pcd = o3d.geometry.PointCloud()
+    out_pcd.points = o3d.utility.Vector3dVector(points[indexes])
+    out_pcd.colors = o3d.utility.Vector3dVector(colors[indexes])
+    return out_pcd
 
 
 def display_inlier_outlier(cloud, ind):

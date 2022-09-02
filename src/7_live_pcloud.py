@@ -5,6 +5,10 @@ import numpy as np
 import utils_stereovision as stereovision
 import utils_arducam as arducam
 
+##################################################
+# /!\ This script still does not work
+##################################################
+
 
 if __name__ == "__main__":
     # Initialisation of the camera
@@ -20,22 +24,30 @@ if __name__ == "__main__":
     geometry = o3d.geometry.PointCloud()
     vis.add_geometry(geometry)
     # Capturing loop
+    t = time.time()
     while arducam.running:
+        if time.time() < t + 1:
+            continue
+        t = time.time()
         image = arducam.getFrame()
         imL, imR = stereovision.splitStereoImage(image)
         w, h = imL.shape[:2]
         rectifiedL, rectifiedR = stereovision.rectifyImages(imL, imR)
         disp_map = matchers.computeFilteredDisparityMap(rectifiedL, rectifiedR)
         points = cv2.reprojectImageTo3D(disp_map, Q)
+        reflect_matrix = np.identity(3)
+        reflect_matrix[0] *= -1
+        points = np.matmul(points, reflect_matrix)
+        colors = cv2.cvtColor(rectifiedL, cv2.COLOR_BGR2RGB)
         mask = disp_map > disp_map.min()
         out_points = points[mask]
-        geometry.points = o3d.utility.Vector3dVector(points)
+        out_colors = colors[mask]
+        geometry.points = o3d.utility.Vector3dVector(out_points)
+        norm_colors = out_colors / 255.0
+        geometry.colors = o3d.utility.Vector3dVector(norm_colors)
         vis.update_geometry(geometry)
         vis.poll_events()
         vis.update_renderer()
-        # Show image
-        cv2.imshow("ArduCam Demo", image)
-        cv2.waitKey(1)
 
     # Close the camera and release the resources
     arducam.close()

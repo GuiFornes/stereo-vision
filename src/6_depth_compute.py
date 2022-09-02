@@ -70,18 +70,19 @@ if __name__ == "__main__":
 
     # Filter the point cloud
     if FILTER_PLY:
-        blur_pcd = pcd.voxel_down_sample(voxel_size=0.05)
+        blur_pcd = pcd  # .voxel_down_sample(voxel_size=0.01)
         print('[INFO] Point cloud blurred')
         filtered_pcd, ind1 = blur_pcd.remove_statistical_outlier(nb_neighbors=20, std_ratio=1.5)
         print('[INFO] Point cloud filtered')
-        double_filtered_pcd, ind2 = filtered_pcd.remove_radius_outlier(nb_points=10, radius=3)
+        double_filtered_pcd, ind2 = filtered_pcd.remove_radius_outlier(nb_points=8, radius=3)
         print('[INFO] Point cloud double filtered')
-        final_pcd = stereovision.sphere_crop_ply(double_filtered_pcd, radius=175)
+        final_pcd = stereovision.sphere_crop_ply(double_filtered_pcd, radius=500)
         print('[INFO] Point cloud cropped')
         t = time.time()
         print('[INFO] Point cloud filtering time : {}'.format(t - t_bis))
 
         if DISPLAY_FILTERING_STEP:
+
             o3d.visualization.draw_geometries([pcd], window_name='Original point cloud',
                                               zoom=0.3412,
                                               front=[0.4257, -0.2125, -0.8795],
@@ -111,3 +112,7 @@ if __name__ == "__main__":
         stereovision.write_ply(filename, out_points, out_colors)
         t = time.time()
         print('[INFO] %s saved' % filename, ', ply saving time : {}'.format(t - t_bis))
+        filename2 = 'out_filtered.ply'
+        stereovision.write_ply(filename2, out_points, out_colors)
+        t_bis = time.time()
+        print('[INFO] %s saved' % filename2, ', ply saving time : {}'.format(t_bis - t))

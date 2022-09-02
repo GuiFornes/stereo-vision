@@ -32,7 +32,9 @@ if __name__ == '__main__':
     cv2.waitKey(0)
     cv2.destroyAllWindows()
     cv2.imwrite("disparity_filtered.png", filtered_disp_vis)
+    cv2.imwrite("disparity_raw.png", raw_disp_vis)
     print("[INFO] disparity_filtered.png saved")
+    print("[INFO] disparity_raw.png saved")
 
 """
 # draft for applying fast bilateral filter (seems not to work)
