@@ -8,8 +8,8 @@ import utils_stereovision as stereovision
 # Execution parameters
 ###########################################################
 SAVE_PLY = True  # save the output point cloud as ply file
-FILTER_PLY = True  # filter the noise in the point cloud and crop it
-DISPLAY_FILTERING_STEP = True  # display the point cloud filtering steps
+FILTER_PLY = False  # filter the noise in the point cloud and crop it
+DISPLAY_FILTERING_STEP = False  # display the point cloud filtering steps
 
 ###########################################################
 # Compute disparity map
@@ -29,8 +29,8 @@ with np.load('calib_data/calibration.npz') as data:
 print("dispMap size : ", disp_map.shape)
 print("ROI : ", leftROI)
 leftROI = (leftROI[0] * 1, leftROI[1] * 1, 960 - (960 - leftROI[2]) * 1, 720 - (720 - leftROI[3]) * 1)
-disp_map = disp_map[leftROI[1]:leftROI[1] + leftROI[3], leftROI[0]:leftROI[0] + leftROI[2]]
-rectifiedL = rectifiedL[leftROI[1]:leftROI[1] + leftROI[3], leftROI[0]:leftROI[0] + leftROI[2]]
+# disp_map = disp_map[leftROI[1]:leftROI[1] + leftROI[3], leftROI[0]:leftROI[0] + leftROI[2]]
+# rectifiedL = rectifiedL[leftROI[1]:leftROI[1] + leftROI[3], leftROI[0]:leftROI[0] + leftROI[2]]
 print("disp_map cropped size : ", disp_map.shape)
 
 cv2.imshow("disp_map", disp_map)
