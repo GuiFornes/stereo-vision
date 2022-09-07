@@ -18,7 +18,7 @@ sudo pip3 install opencv-contrib-python
 This project is made of a series of python scripts, to launch from the src repository.
 If you are not already in, do this:
 ```Bash
-> $ cd src/
+cd src/
 ```
 ### The first 3 scripts depend on each others in the right order, and consist of the calibration of the stereo-system
 _Calibration datas is already provided in this repo, therefore if you don't want to re-calibrate the camera, 
@@ -42,6 +42,7 @@ python3 2_pairs_cut.py
 python3 3_calibration.py
 ```
 ### The following scripts are independent of each others and can be launched after that the calibration is realized.
+Scripts 4 and 6 work with the picture stored in `scenes/photo.png`. Save a picture with script 0 or put one there.
 - **_src/4_disparity/py_** : Compute and show the disparity map of `src/scenes/photo.png`.
  ```bash
 python3 4_disparity.py
@@ -51,6 +52,12 @@ python3 4_disparity.py
 sudo python3 5_disp_video.py ../Config/OV5647/stereo/OV5647_MIPI_2Lane_RAW8_8b_2592x1944_BA.cfg
 ```
 - **_src/6_depth_compute.py_** : Reconstruct the 3D point cloud scene 
+from the disparity map of `src/scenes/photo.png`. 
+The output is in `src/praxis_filtered.ply`, visionnable with MeshLab
+ ```bash
+python3 6_depth_compute.py
+```
+- **_src/7_live_pcloud.py_** : Animated live 3D point cloud from the camera stream. Actually not working... 
 from the disparity map of `src/scenes/photo.png`. 
 The output is in `src/praxis_filtered.ply`, visionnable with MeshLab
  ```bash

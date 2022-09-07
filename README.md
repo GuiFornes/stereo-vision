@@ -9,7 +9,7 @@ as part of a tactile sensor project from CoRo lab.
 - **_src_** : Contains the source code of the project.
 - **_src/scenes_** : Contains the calibration chess pictures.
 - **_src/PNGs_** : Contains example stereo scenes to reproject into 3D.
-- **_src/PLYs_** : Contains the 3D reconstruction examples.
+- **_src/PLYs_** : Contains the 3D reconstruction results.
 
 ## Install Python 3 and OpenCV
 - Install Python 3
