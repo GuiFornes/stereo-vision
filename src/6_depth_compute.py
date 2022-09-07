@@ -1,3 +1,4 @@
+import os.path
 import time
 import open3d as o3d
 import cv2
@@ -107,12 +108,14 @@ if __name__ == "__main__":
                                               up=[-0.0694, -0.9768, 0.2024])
 
     if SAVE_PLY:
+        if not os.path.exists('./PLYs'):
+            os.makedirs('./PLYs')
         t_bis = time.time()
-        filename = 'out.ply'
+        filename = 'PLYs/out.ply'
         stereovision.write_ply(filename, out_points, out_colors)
         t = time.time()
         print('[INFO] %s saved' % filename, ', ply saving time : {}'.format(t - t_bis))
-        filename2 = 'out_filtered.ply'
+        filename2 = 'PLYs/out_filtered.ply'
         stereovision.write_ply(filename2, out_points, out_colors)
         t_bis = time.time()
         print('[INFO] %s saved' % filename2, ', ply saving time : {}'.format(t_bis - t))
