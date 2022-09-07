@@ -39,7 +39,7 @@ python3 2_pairs_cut.py
 ```
 - **_src/3_calibration_new.py_** : Calibrate the cameras intrinsic and extrinsic.
  ```bash
-python3 3_calibration_new.py
+python3 3_calibration.py
 ```
 ### The following scripts are independent of each others and can be launched after that the calibration is realized.
 - **_src/4_disparity/py_** : Compute and show the disparity map of `src/scenes/photo.png`.

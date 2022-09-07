@@ -44,12 +44,12 @@ Those are different projects that I used to build this one.
 
  - **_ArduCAM_** : source files to launch a camera with arduCam module.
 
-https://github.com/ArduCAM/arducam_config_parser.git
-https://github.com/ArduCAM/ArduCAM_USB_Camera_Shield.git
+https://github.com/ArduCAM/arducam_config_parser.git  
+https://github.com/ArduCAM/ArduCAM_USB_Camera_Shield.git  
 
  - **_Others stereo-vision projects_** :
 
-https://github.com/kanavsinglaa/StereoVision.git
-https://github.com/ArduCAM/MIPI_Camera.git
-https://github.com/realizator/stereopi-fisheye-robot.git
-https://github.com/niconielsen32/ComputerVision.git
+https://github.com/kanavsinglaa/StereoVision.git  
+https://github.com/ArduCAM/MIPI_Camera.git  
+https://github.com/realizator/stereopi-fisheye-robot.git  
+https://github.com/niconielsen32/ComputerVision.git  
