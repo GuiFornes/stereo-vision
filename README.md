@@ -2,7 +2,10 @@
 
 ## Overview
 This project is about stereo vision and 3D reconstruction, 
-as part of a tactile sensor project from CoRo lab.
+as part of a tactile sensor project for CoRo lab.
+
+![alt text](https://github.com/GuiFornes/stereo-vision/blob/main/example_disparity.png?raw=true)
+![alt text](https://github.com/GuiFornes/stereo-vision/blob/main/example_pointcloud.png?raw=true)
 
 ## Repository
 - **_Config_** : Contains the config files of the OV5647 camera.
