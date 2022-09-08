@@ -26,12 +26,12 @@ you can directly pass to the next part_
 - **_src/0_test.py_** : Test the camera and allow the user to take a picture with 's' + 'enter' 
 (Needed for futur non-video scripts).
  ```bash
-sudo python3 0_test.py ../Config/OV5647/stereo/OV5647_MIPI_2Lane_RAW8_8b_2592x1944_BA.cfg
+python3 0_test.py ../Config/OV5647/stereo/OV5647_MIPI_2Lane_RAW8_8b_2592x1944_BA.cfg
 ```
 - **_src/1_chess_cycle.py_** : Launch this one to take chessboard images for calibration. 
 The number of images to take is set in `utils_stereovision.py`.
  ```bash
-sudo python3 1_chess_cycle.py ../Config/OV5647/stereo/OV5647_MIPI_2Lane_RAW8_8b_2592x1944_BA.cfg
+python3 1_chess_cycle.py ../Config/OV5647/stereo/OV5647_MIPI_2Lane_RAW8_8b_2592x1944_BA.cfg
 ```
 - **_src/2_pairs_cut.py_** : Cut the stereo images into left and right views.
  ```bash
@@ -61,5 +61,5 @@ python3 6_depth_compute.py
 from the disparity map of `src/scenes/photo.png`. 
 The output is in `src/praxis_filtered.ply`, visionnable with MeshLab
  ```bash
-python3 6_depth_compute.py
+python3 7_live_pcloud.py
 ```
